@@ -31,12 +31,11 @@ def generatorQrcode(inPath, outPath):
     base_img = Image.open('./base.png')
     # base_img = None
     region_resize = (120, 120)  # 重新定义二维码尺寸(width, height)
-    top, left = 0, 0
     if base_img:
         left = int((base_img.size[0] - region_resize[0]) / 2)
         top = int((base_img.size[1] - region_resize[1]) / 2)
-    # left为二维码距离base_image左边的距离, top为上边距, 如果上下不居中 需要手动调整top的值
-    box = (left, top)
+        box = (left, top)  # left为二维码距离base_image左边的距离, top为上边距, 如果上下不居中 需要手动调整top的值
+    
     for f in files:
         path = IN_DIR + '/' + f
         if os.path.isfile(path):
@@ -93,5 +92,4 @@ def generatorQrcode(inPath, outPath):
 
 if __name__ == '__main__':
     generatorQrcode('input', 'output')
-    # convert_images_to_pdf('./output', './output.pdf')
     print 'ok! done!'
