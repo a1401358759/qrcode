@@ -30,11 +30,11 @@ def generatorQrcode(inPath, outPath):
     files = os.listdir(IN_DIR)
     base_img = Image.open('./base.png')
     # base_img = None
+    region_resize = (120, 120)  # 重新定义二维码尺寸(width, height)
     top, left = 0, 0
     if base_img:
         left = int((base_img.size[0] - region_resize[0]) / 2)
         top = int((base_img.size[1] - region_resize[1]) / 2)
-    region_resize = (120, 120)  # 重新定义二维码尺寸(width, height)
     # left为二维码距离base_image左边的距离, top为上边距, 如果上下不居中 需要手动调整top的值
     box = (left, top)
     for f in files:
