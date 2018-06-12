@@ -29,58 +29,58 @@ def generatorQrcode(inPath, outPath):
 
     files = os.listdir(IN_DIR)
     base_img = Image.open('./base.png')
-    # base_img = None
     region_resize = (120, 120)  # 重新定义二维码尺寸(width, height)
-    if base_img:
-        left = int((base_img.size[0] - region_resize[0]) / 2)
-        top = int((base_img.size[1] - region_resize[1]) / 2)
-        box = (left, top)  # left为二维码距离base_image左边的距离, top为上边距, 如果上下不居中 需要手动调整top的值
-    
+    left = (base_img.size[0] - region_resize[0]) / 2
+    top = (base_img.size[1] - region_resize[1]) / 2
+    box = (left, top)
     for f in files:
         path = IN_DIR + '/' + f
         if os.path.isfile(path):
-            with open(path, 'r') as open_file:
-                while True:
-                    info = open_file.readline()
-                    info = info.strip('\n')
-                    if not info:
-                        break
-                    # 生成二维码
-                    qr = qrcode.QRCode(
-                        version=None,  # 二维码的大小, int, 1-40(最小值是1，是个12×12的矩阵), 如果让程序自动生成，将值设置为None并使用fit=True参数
-                        error_correction=qrcode.constants.ERROR_CORRECT_H,  # 二维码的纠错范围，可以选择4个常量, 默认ERROR_CORRECT_M
-                        box_size=10,  # 每个点(方块)中的像素个数
-                        border=0  # 二维码距图像外围边框距离, 默认为4
-                    )
-                    qr.add_data(info)
-                    qr.make(fit=True)
-                    img = qr.make_image()
+            # name = os.path.splitext(f)[0]
+            open_file = open(path)
+            while True:
+                info = open_file.readline()
+                info = info.strip('\n')
+                if not info:
+                    break
+                # 生成二维码
+                qr = qrcode.QRCode(
+                    version=None,  # 二维码的大小, int, 1-40(最小值是1，是个12×12的矩阵), 如果让程序自动生成，将值设置为None并使用fit=True参数
+                    error_correction=qrcode.constants.ERROR_CORRECT_M,  # 二维码的纠错范围，可以选择4个常量, 默认ERROR_CORRECT_M
+                    box_size=10,  # 每个点(方块)中的像素个数
+                    border=0  # 二维码距图像外围边框距离, 默认为4, 且相关规定最小为4
+                )
+                qr.add_data(info)
+                qr.make(fit=True)
+                img = qr.make_image()
 
-                    # 将二维码保存并重新设置大小
-                    name = info.split('q=')[1]
-                    img_path = OUT_DIR + '/' + name + '.png'  # 图片存储路径
-                    img.resize(region_resize, resample=Image.LANCZOS).save(img_path)
+                # 将二维码保存并重新设置大小
+                name = info.split('q=')[1]
+                img_path = OUT_DIR + '/' + name + '.png'  # 图片存储路径
+                img.save(img_path)
+                img = Image.open(img_path)
+                region = img
+                region = region.resize(region_resize)
 
-                    # 将二维码附着在图片上
-                    if base_img:
-                        base_img.paste(img, box)
-                        base_img.save(img_path)
+                # 将二维码附着在图片上
+                base_img.paste(region, box)
+                base_img.save(img_path)
 
-                    # 图片写入PDF文件
-                    x += 5
-                    c.drawImage(img_path, x, y, 80, 130)
-                    if x > 680:
-                        x = 0
-                        y -= 135
-                    else:
-                        x += 80
+                # 图片写入PDF文件
+                x += 5
+                c.drawImage(img_path, x, y, 80, 130)
+                if x > 680:
+                    x = 0
+                    y -= 135
+                else:
+                    x += 80
 
-                    if y < 0:
-                        c.showPage()
-                        y = high - 130
-                    os.remove(img_path)  # 图片写入完成后删除
+                if y < 0:
+                    c.showPage()
+                    y = high - 130
+                os.remove(img_path)  # 图片写入完成后删除
 
-                c.save()
+            c.save()
 
 
 # 附: 生成二维码时error_correction参数选项及说明
@@ -90,6 +90,29 @@ def generatorQrcode(inPath, outPath):
 # ERROR_CORRECT_H. 30%以下的错误会被纠正
 
 
+# def convert_images_to_pdf(img_path, pdf_path):
+#     (width, high) = portrait(A3)
+#     c = canvas.Canvas(pdf_path, pagesize=portrait(A3))
+#     img_name_list = os.listdir(img_path)
+#     x = 0
+#     y = high - 130
+#     for img_name in img_name_list:
+#         x += 5
+#         img_file = img_path + os.sep + str(img_name)
+#         c.drawImage(img_file, x, y, 80, 130)
+#         if x > 680:
+#             x = 0
+#             y -= 135
+#         else:
+#             x += 80
+#
+#         if y < 0:
+#             c.showPage()
+#             y = high - 130
+#     c.save()
+
+
 if __name__ == '__main__':
     generatorQrcode('input', 'output')
+    # convert_images_to_pdf('./output', './output.pdf')
     print 'ok! done!'
